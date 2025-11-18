@@ -2,16 +2,16 @@ from pymongo import MongoClient, UpdateOne
 from datetime import datetime
 
 client = MongoClient("mongodb://localhost:27017")     
-db = client["stock_data"]
+db = client["bitcoin_data"]
 collection = db["prices"]
 
-def insert_daily(df):
+def Insert(df):
     operations = []
 
     for _, row in df.iterrows():
         doc = {
             "ticker": row["ticker"],
-            "date": row["date"],
+            "date": row["date"],                      
             "open": float(row["Open"]),
             "high": float(row["High"]),
             "low": float(row["Low"]),
