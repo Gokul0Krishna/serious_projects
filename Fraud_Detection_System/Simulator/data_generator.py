@@ -1,5 +1,6 @@
 from datetime  import datetime,timezone,timedelta
 from math import radians,sin,cos,asin,sqrt
+from time import sleep 
 from random import uniform,seed,choice,choices,randint,sample,random
 from faker import Faker
 import uuid
@@ -155,19 +156,19 @@ class Merchantmananger(Userprofile):
 
     def set_lover_merchant(self,user_profile):
         'sets prefered merchant'
-        if user_profile['prepreferred_merchants'] and random()<0.7:
-            a = choice(user_profile['prepreferred_merchants'])
+        if user_profile['preferred_merchants'] and random()<0.7:
+            a = choice(user_profile['preferred_merchants'])
             return self.merchants[a]
         else:
             return self.merchants[choice(list(self.merchants.keys()))]
 
 class FraudSetter:
-    def __init__(self, distance_threshold=50, velocity_threshold=5, night_penalty=1, setseed=None):
+    def __init__(self, distance_threshold=50, velocity_threshold=5, night_penalty=1, set_seed=None):
         self.distance_threshold = distance_threshold
         self.velocity_threshold = velocity_threshold
         self.night_penalty = night_penalty
-        if setseed is not None:
-            seed(setseed)
+        if set_seed is not None:
+            seed(set_seed)
     
     def score(self,compare_data,user_profile):
         score = 0
@@ -179,7 +180,7 @@ class FraudSetter:
         user_lat, user_lon = user_profile["home_base"]
         cp_lat, cp_lon = compare_data["geo_location"]
         dist = dis_calc_in_km(user_lat, user_lon, cp_lat, cp_lon)
-        if dist > self.distance_threshold_km:
+        if dist > self.distance_threshold:
             score += 2
             reasons.append(f"far_location_{int(dist)}km")
 
@@ -197,6 +198,7 @@ class FraudSetter:
         if not active:
             score += self.night_penalty
             reasons.append("off_hours")
+        recent = user_profile.get("recent_timestamps", [])
         one_min_ago = a - timedelta(minutes=1)
         recent_count = sum(1 for r in recent if r >= one_min_ago)
         recent = user_profile.get("recent_timestamps", [])
@@ -208,12 +210,12 @@ class FraudSetter:
 
 class TransactionGenerator:
     def __init__(self,user_mgr:Userprofile,merchant_mgr:Merchantmananger,\
-                 fraud_engineer:FraudSetter,setseed = None):
+                 fraud_engineer:FraudSetter,set_seed = None):
         self.user_obj= user_mgr
         self.merchant_obj = merchant_mgr
         self.fraud_obj = fraud_engineer
-        if setseed is not None:
-            seed(setseed)
+        if set_seed is not None:
+            seed(set_seed)
 
     def generate(self):
         user = self.user_obj.whale_assigner()
@@ -221,7 +223,7 @@ class TransactionGenerator:
         ph_start, ph_end = user['peak_hours']
         now = datetime.utcnow().replace(tzinfo=timezone.utc)
         
-        if random.random() < 0.8:
+        if random() < 0.8:
             if ph_start <= ph_end:
                 hour = randint(ph_start,ph_end)
             else:
@@ -245,7 +247,7 @@ class TransactionGenerator:
         else:
             device = choice(self.user_obj.device)
 
-        if random.random() < 0.03:
+        if random() < 0.03:
             other = choice(self.user_obj.cities)
             tx_lat,tx_lon = noise_to_dist_adder(other[1],other[2],km_radius=5)
         else:
@@ -254,7 +256,7 @@ class TransactionGenerator:
         base_min = max(user["spend_min"], merchant["amount_min"])
         base_max = min(user["spend_max"], merchant["amount_max"])
         if base_min >= base_max:
-            amount = round(random.uniform(1, base_max * 1.1 + 10), 2)
+            amount = round(uniform(1, base_max * 1.1 + 10), 2)
         else:
             p = random()
             if p<0.6:
@@ -262,7 +264,7 @@ class TransactionGenerator:
             elif p<0.95:
                 amount = round(uniform((base_min + base_max)/2,base_max),2)
             else:
-                amount = round(random.uniform(base_max,base_max*5),2) 
+                amount = round(uniform(base_max,base_max*5),2) 
         tx = {
             "transaction_id": str(uuid.uuid4()),
             "user_id": user["user_id"],
@@ -281,7 +283,7 @@ class TransactionGenerator:
         recent.append(now_dt)
         user["recent_timestamps"] = recent
 
-        score, reasons = self.fraud_engine.score(tx, user)
+        score, reasons = self.fraud_obj.score(tx, user)
         tx["fraud_score"] = score
         tx["fraud_reasons"] = reasons
         tx["is_fraud"] = 1 if score >= 2 else 0
@@ -293,11 +295,11 @@ class TransactionGenerator:
         if bust:
             for i in range(randint(2,4)):
                 b = dict(tx)
-                b['transaction_id'] = (now_dt +timedelta(seconds=random.randint(1, 30))).isoformat().replace("+00:00", "Z")
-                b["amount"] = round(max(1.0, b["amount"] * random.uniform(0.5, 1.5)), 2)
-                if random.random() < 0.2:
-                    b["device_id"] = random.choice(["android_11_samsung", "web_chrome", "ios_15_iphone13"])
-                score2, reasons2 = self.fraud_engine.score(b, user)
+                b['transaction_id'] = (now_dt +timedelta(seconds=randint(1, 30))).isoformat().replace("+00:00", "Z")
+                b["amount"] = round(max(1.0, b["amount"] * uniform(0.5, 1.5)), 2)
+                if random() < 0.2:
+                    b["device_id"] = choice(["android_11_samsung", "web_chrome", "ios_15_iphone13"])
+                score2, reasons2 = self.fraud_obj.score(b, user)
                 b["fraud_score"] = score2
                 b["fraud_reasons"] = reasons2
                 b["is_fraud"] = 1 if score2 >= 2 else 0
@@ -311,15 +313,15 @@ class Simulator:
             seed(args.seed)
             Faker.seed(args.seed)
 
-        self.user_mgr = Userprofile(n_users=args.num_users, seed=args.seed)
+        self.user_mgr = Userprofile(n_user=args.num_users, set_seed=args.seed)
         self.user_mgr.create_user()
-        self.merchant_mgr = Merchantmananger(n_merchants=args.num_merchants, seed=args.seed)
+        self.merchant_mgr = Merchantmananger(n_merchants=args.num_merchants, set_seed=args.seed)
         self.merchant_mgr.creat_mechant()
         self.user_mgr.give_merchant(list(self.merchant_mgr.merchants.keys()))
-        self.fraud_engine = FraudSetter(distance_threshold_km=args.distance_km,
+        self.fraud_engine = FraudSetter(distance_threshold=args.distance_km,
                                         velocity_threshold=args.velocity_threshold,
-                                        seed=args.seed)
-        self.txgen = TransactionGenerator(self.user_mgr, self.merchant_mgr, self.fraud_engine, seed=args.seed)
+                                        set_seed=args.seed)
+        self.txgen = TransactionGenerator(self.user_mgr, self.merchant_mgr, self.fraud_engine, set_seed=args.seed)
         self.out_file = None
 
         if args.out_file:
@@ -331,6 +333,44 @@ class Simulator:
 
         self.stop_flag = threading.Event()
 
+    def close(self):
+        if self.out_file:
+            self.out_file.close()
+
+    def push_redis(self, tx):
+        if not self.redis_client:
+            return
+        try:
+            data = {"json": json.dumps(tx)}
+            self.redis_client.xadd("transactions", data)
+        except Exception as e:
+            LOG.exception("redis push failed: %s", e)
+
+    def _emit(self, tx):
+        s = json.dumps(tx, ensure_ascii=True)
+        print(s,flush=True)
+        if self.out_file:
+            self.out_file.write(s + "\n")
+        if self.redis_client:
+            self.push_redis(tx)
+
+    def run(self):
+        rate = max(0.01, float(self.args.rate))
+        interval = 1.0 / rate
+        LOG.info("Simulator starting: rate=%.2f tx/s, users=%d, merchants=%d", rate, len(self.user_mgr.users),
+                len(self.merchant_mgr.merchants))
+        try:
+            while not self.stop_flag.is_set():
+                batch = self.txgen.generate()
+                for tx in batch:
+                    self._emit(tx)
+                    sleep(min(0.02, interval / 4.0))
+                sleep(interval)
+        except KeyboardInterrupt:
+            LOG.info("Received KeyboardInterrupt, shutting down...")
+        finally:
+            self.close()
+            LOG.info("Simulator stopped.")
 
 def parse_args():
     p = argparse.ArgumentParser(description="Realistic transaction simulator")
