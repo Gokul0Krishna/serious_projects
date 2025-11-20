@@ -15,7 +15,7 @@ LOG = logging.getLogger("simulator")
 faker = Faker()
 
 def gen_iso():
-    return datetime.utcnow().replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
+    return datetime.now().replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
 
 def dis_calc_in_km(lat1, lon1, lat2, lon2):
     R = 6371.0
@@ -65,8 +65,7 @@ class Userprofile:
         self.hours = [
                         (7,10),
                         (12,14),
-                        (18,24),
-                        (0,24)
+                        (18,23),
                     ]
 
         self.device =[
@@ -221,13 +220,13 @@ class TransactionGenerator:
         user = self.user_obj.whale_assigner()
         merchant = self.merchant_obj.set_lover_merchant(user)
         ph_start, ph_end = user['peak_hours']
-        now = datetime.utcnow().replace(tzinfo=timezone.utc)
+        now = datetime.now().replace(tzinfo=timezone.utc)
         
         if random() < 0.8:
             if ph_start <= ph_end:
-                hour = randint(ph_start,ph_end)
+                hour = randint(ph_start,ph_end-1)
             else:
-                hours = list(range(ph_start,24)+list(range(0,ph_end+1)))
+                hours = list(range(ph_start,24)+list(range(0,ph_end)))
                 hour = choice(hours)
             minu = randint(0,59)
             sec  = randint(0,59)
@@ -325,7 +324,7 @@ class Simulator:
         self.out_file = None
 
         if args.out_file:
-            self.out_file = open(args.out_file, "a", buffering=1)
+            self.out_file = open(args.out_file, "a+", buffering=1)
 
         self.redis_client = None
         if args.redis_url:
@@ -348,7 +347,7 @@ class Simulator:
 
     def _emit(self, tx):
         s = json.dumps(tx, ensure_ascii=True)
-        print(s,flush=True)
+        # print(s,flush=True)
         if self.out_file:
             self.out_file.write(s + "\n")
         if self.redis_client:
@@ -377,7 +376,7 @@ def parse_args():
     p.add_argument("--num-users", type=int, default=300, help="Number of fake users to generate")
     p.add_argument("--num-merchants", type=int, default=60, help="Number of merchants")
     p.add_argument("--rate", type=float, default=10.0, help="Average transactions per second")
-    p.add_argument("--out-file", type=str, default=None, help="Write JSONL output to this file")
+    p.add_argument("--out-file", type=str, default='Fraud_Detection_System/data/output.jsonl', help="Write JSONL output to this file")
     p.add_argument("--redis-url", type=str, default=None, help="Optional Redis URL to push Stream entries")
     p.add_argument("--seed", type=int, default=42, help="RNG seed for reproducibility")
     p.add_argument("--distance-km", type=float, default=50.0, help="Distance threshold for fraud scoring (km)")
