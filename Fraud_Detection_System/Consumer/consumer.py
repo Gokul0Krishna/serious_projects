@@ -5,7 +5,9 @@ import pickle
 import xgboost
 import redis
 from pymongo import MongoClient
+import logging
 
+LOG = logging.getLogger(__name__)
 
 # class live_ped():
 #     def __init__(self):
@@ -21,9 +23,13 @@ from pymongo import MongoClient
 #                 return self.model.predict(x)
             
 class Consumer():
-    def __init__(self):   
+    def __init__(self):
+
+        LOG.info("Loading model...")   
         with open(r'C:\Users\ASUS\OneDrive\Desktop\code\serious_projects\Fraud_Detection_System\models\model.pkl', 'rb') as file:
                 self.model = pickle.load(file)
+
+        LOG.info("Connecting to Redis...")
         self.redis = redis.Redis(host='localhost', port=6379, decode_responses=True)
         self.group = "fraud_group"
         self.consumer = "consumer_1"
@@ -31,7 +37,8 @@ class Consumer():
             self.redis.xgroup_create("transactions", self.group, id="0", mkstream=True)
         except:
             pass 
-        
+
+        LOG.info("Connecting to DB...")
         client = MongoClient("mongodb://localhost:27017")
         db = client["fraud_detection"]  
         self.fraud_collection = db["fraud_tx"]
@@ -61,3 +68,6 @@ class Consumer():
 def cmain():
     obj = Consumer()
     obj.run()
+
+if __name__ == '__main__':
+    cmain()

@@ -348,8 +348,8 @@ class Generator:
     def _emit(self, tx):
         s = json.dumps(tx, ensure_ascii=True)
         # print(s,flush=True)
-        # if self.out_file:
-        #     self.out_file.write(s + "\n")
+        if self.out_file:
+            self.out_file.write(s + "\n")
         if self.redis_client:
             self.push_redis(tx)
 
