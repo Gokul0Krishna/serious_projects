@@ -283,9 +283,9 @@ class TransactionGenerator:
         user["recent_timestamps"] = recent
 
         score, reasons = self.fraud_obj.score(tx, user)
-        tx["fraud_score"] = score
-        tx["fraud_reasons"] = reasons
-        tx["is_fraud"] = 1 if score >= 2 else 0
+        # tx["fraud_score"] = score
+        # tx["fraud_reasons"] = reasons
+        # tx["is_fraud"] = 1 if score >= 2 else 0
         user_lat, user_lon = user["home_base"]
         tx["distance_from_home_km"] = round(dis_calc_in_km(user_lat, user_lon, tx_lat, tx_lon), 2)
 
@@ -298,10 +298,10 @@ class TransactionGenerator:
                 b["amount"] = round(max(1.0, b["amount"] * uniform(0.5, 1.5)), 2)
                 if random() < 0.2:
                     b["device_id"] = choice(["android_11_samsung", "web_chrome", "ios_15_iphone13"])
-                score2, reasons2 = self.fraud_obj.score(b, user)
-                b["fraud_score"] = score2
-                b["fraud_reasons"] = reasons2
-                b["is_fraud"] = 1 if score2 >= 2 else 0
+                # score2, reasons2 = self.fraud_obj.score(b, user)
+                # b["fraud_score"] = score2
+                # b["fraud_reasons"] = reasons2
+                # b["is_fraud"] = 1 if score2 >= 2 else 0
                 result.append(b)
         return result
     
@@ -348,8 +348,8 @@ class Simulator:
     def _emit(self, tx):
         s = json.dumps(tx, ensure_ascii=True)
         # print(s,flush=True)
-        if self.out_file:
-            self.out_file.write(s + "\n")
+        # if self.out_file:
+        #     self.out_file.write(s + "\n")
         if self.redis_client:
             self.push_redis(tx)
 
@@ -377,7 +377,7 @@ def parse_args():
     p.add_argument("--num-merchants", type=int, default=60, help="Number of merchants")
     p.add_argument("--rate", type=float, default=10.0, help="Average transactions per second")
     p.add_argument("--out-file", type=str, default='Fraud_Detection_System/data/output.jsonl', help="Write JSONL output to this file")
-    p.add_argument("--redis-url", type=str, default=None, help="Optional Redis URL to push Stream entries")
+    p.add_argument("--redis-url", type=str, default='redis://localhost:6379', help="Optional Redis URL to push Stream entries")
     p.add_argument("--seed", type=int, default=42, help="RNG seed for reproducibility")
     p.add_argument("--distance-km", type=float, default=50.0, help="Distance threshold for fraud scoring (km)")
     p.add_argument("--velocity-threshold", type=int, default=5, help="Transactions/min velocity threshold")

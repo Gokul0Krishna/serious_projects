@@ -1,4 +1,4 @@
-Stock Price Prediction/.env
+.env
 Stock Price Prediction/model_prep/data/cleaned_data.csv
 Fraud_Detection_System/data/output.jsonl
 Fraud_Detection_System/data/model_data.csv
