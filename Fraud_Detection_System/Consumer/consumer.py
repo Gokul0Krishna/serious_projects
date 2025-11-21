@@ -4,19 +4,21 @@ import pandas as pd
 import pickle
 import xgboost
 import redis
-    
-class live_ped():
-    def __init__(self):
-        with open(r'C:\Users\ASUS\OneDrive\Desktop\code\serious_projects\Fraud_Detection_System\models\model.pkl', 'rb') as file:
-            self.model = pickle.load(file)
-    def run(self):
-        while True:
-            with open(r'C:\Users\ASUS\OneDrive\Desktop\code\serious_projects\Fraud_Detection_System\data\output.jsonl','r+') as file:
-                data = file.readlines()
-                records = [json.loads(data[-1])]
-                df = pd.DataFrame(records)
-                x = df[['amount','distance_from_home_km']]
-                return self.model.predict(x)
+from pymongo import MongoClient
+
+
+# class live_ped():
+#     def __init__(self):
+#         with open(r'C:\Users\ASUS\OneDrive\Desktop\code\serious_projects\Fraud_Detection_System\models\model.pkl', 'rb') as file:
+#             self.model = pickle.load(file)
+#     def run(self):
+#         while True:
+#             with open(r'C:\Users\ASUS\OneDrive\Desktop\code\serious_projects\Fraud_Detection_System\data\output.jsonl','r+') as file:
+#                 data = file.readlines()
+#                 records = [json.loads(data[-1])]
+#                 df = pd.DataFrame(records)
+#                 x = df[['amount','distance_from_home_km']]
+#                 return self.model.predict(x)
             
 class Consumer():
     def __init__(self):   
@@ -29,7 +31,11 @@ class Consumer():
             self.redis.xgroup_create("transactions", self.group, id="0", mkstream=True)
         except:
             pass 
-    
+        
+        client = MongoClient("mongodb://localhost:27017")
+        db = client["fraud_detection"]  
+        self.fraud_collection = db["fraud_tx"]
+        
     def run(self):
         while True:
             msgs = self.redis.xreadgroup(
@@ -48,4 +54,10 @@ class Consumer():
                     x = df[['amount', 'distance_from_home_km']]
 
                     pred = self.model.predict(x)[0]
+                    if pred == 1:
+                        self.fraud_collection.insert_one(tx)
                     self.redis.xack("transactions", self.group, msg_id)
+
+def cmain():
+    obj = Consumer()
+    obj.run()

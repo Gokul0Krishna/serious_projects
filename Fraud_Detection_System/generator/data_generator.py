@@ -305,7 +305,7 @@ class TransactionGenerator:
                 result.append(b)
         return result
     
-class Simulator:
+class Generator:
     def __init__(self,args):
         self.args = args
         if args.seed is not None:
@@ -375,19 +375,19 @@ def parse_args():
     p = argparse.ArgumentParser(description="Realistic transaction simulator")
     p.add_argument("--num-users", type=int, default=300, help="Number of fake users to generate")
     p.add_argument("--num-merchants", type=int, default=60, help="Number of merchants")
-    p.add_argument("--rate", type=float, default=10.0, help="Average transactions per second")
-    p.add_argument("--out-file", type=str, default='Fraud_Detection_System/data/output.jsonl', help="Write JSONL output to this file")
-    p.add_argument("--redis-url", type=str, default='redis://localhost:6379', help="Optional Redis URL to push Stream entries")
+    p.add_argument("--rate", type=float, default=3.0, help="Average transactions per second")
+    p.add_argument("--out-file", type=str, default=r'C:\Users\ASUS\OneDrive\Desktop\code\serious_projects\Fraud_Detection_System\data\output.jsonl', help="Write JSONL output to this file")
+    p.add_argument("--redis-url", type=str, default='redis://localhost:6379/0', help="Optional Redis URL to push Stream entries")
     p.add_argument("--seed", type=int, default=42, help="RNG seed for reproducibility")
     p.add_argument("--distance-km", type=float, default=50.0, help="Distance threshold for fraud scoring (km)")
     p.add_argument("--velocity-threshold", type=int, default=5, help="Transactions/min velocity threshold")
     return p.parse_args()
 
 
-def main():
+def gmain():
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     args = parse_args()
-    sim = Simulator(args)
+    sim = Generator(args)
 
     def shutdown(sig, frame):
         LOG.info("Signal %s received, stopping...", sig)
@@ -398,4 +398,4 @@ def main():
     sim.run() 
 
 if __name__ == '__main__':
-    main()
+    gmain()
