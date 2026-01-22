@@ -37,7 +37,6 @@ def fetch_yf(asset_name,start = None,end = None,interval = '1d'):
     else:
         df = new
     cust_save(asset_name=asset_name,df=df)
-    
-
+    return df
 if __name__ != '__dick__':
     pass
