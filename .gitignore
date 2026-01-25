@@ -4,5 +4,6 @@ Fraud_Detection_System/data/output.jsonl
 Fraud_Detection_System/data/model_data.csv
 model_monitering/data/Loan_approval_data_2025.csv
 Trading/data/BTC-USD.parquet
-Predictive_Logistics_Control/models/m5_clean_daily.parquet
-Predictive_Logistics_Control/models/m5_clean_daily2.parquet
+Predictive_Logistics_Control/backend/models/m5_clean_daily.parquet
+Predictive_Logistics_Control/backend/models/m5_clean_daily2.parquet
+Predictive_Logistics_Control/backend/models/exp_model.joblib
