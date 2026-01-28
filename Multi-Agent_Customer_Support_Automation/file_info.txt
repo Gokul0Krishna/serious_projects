@@ -1,0 +1,88 @@
+ROJECT 2: Multi-Agent Customer Support Automation (Flipkart/Swiggy/Razorpay Focus)
+-----------------------------------------------------------------------------------
+RELEVANCE: E-commerce customer service, Food delivery support, Payment issue resolution
+SKILLS: AI Agents, LangGraph, Function Calling, Intent Classification, Sentiment Analysis
+
+BUILD:
+An intelligent customer support system with multiple specialized agents that handle
+different aspects of customer queries:
+
+Agent Architecture:
+1. Router Agent (Intent Classification)
+   - Classifies query type: order tracking, refund, product inquiry, complaint
+   - Routes to appropriate specialist agent
+
+2. Order Management Agent
+   - Checks order status via mock API
+   - Provides delivery estimates
+   - Handles order modifications
+
+3. Refund & Payment Agent
+   - Processes refund requests
+   - Checks payment status
+   - Escalates to human if >$X amount
+
+4. Product Recommendation Agent
+   - Suggests alternatives if product out of stock
+   - Provides product information
+   - Uses embeddings for similarity search
+
+5. Escalation Agent
+   - Detects frustration/anger via sentiment analysis
+   - Creates ticket for human agent
+   - Provides immediate acknowledgment
+
+Core Features:
+- Multi-turn conversations with context retention
+- Sentiment-aware responses (adapt tone based on customer emotion)
+- Integration with mock APIs (orders, inventory, payments)
+- Fallback to human agent with full conversation history
+- Multi-channel support (chat, email, voice transcription)
+- Regional language support (English, Hindi, Kannada)
+- Automated ticket generation
+- Customer satisfaction scoring
+
+Tech Stack:
+- LLM: GPT-4 or Claude with function calling
+- Orchestration: LangGraph for agent workflows
+- Sentiment: Fine-tuned BERT on customer support data
+- Intent Classification: SetFit (few-shot learning)
+- Vector DB: Pinecone for product catalog
+- Backend: FastAPI with WebSocket for real-time chat
+- Frontend: Next.js with chat UI
+- Queue: Redis for handling concurrent requests
+- Monitoring: Track resolution rate, escalation rate, sentiment trends
+
+Advanced Features:
+- Proactive outreach (order delay notifications)
+- FAQ auto-generation from past conversations
+- Agent performance analytics
+- A/B testing different prompts
+- Voice support with Whisper transcription
+- WhatsApp integration (Twilio API)
+
+DEPLOYMENT:
+- Backend on AWS ECS with auto-scaling
+- Frontend on Vercel
+- Redis on AWS ElastiCache
+- WebSocket via AWS API Gateway
+
+WHY THIS MATTERS:
+- Flipkart has 500M+ customers needing support
+- Swiggy handles 50K+ support queries daily
+- Razorpay needs instant payment issue resolution
+- All e-commerce/fintech companies invest heavily here
+
+DEMO SCENARIO:
+Create synthetic customer conversations covering:
+- Order tracking and delivery issues
+- Refund and return requests
+- Product recommendations
+- Complaint handling
+- Payment failures
+
+Show:
+- Successful automation (80% queries handled)
+- Sentiment-based escalation
+- Multi-language support
+- Response time <2 seconds
