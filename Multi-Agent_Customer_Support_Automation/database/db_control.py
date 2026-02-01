@@ -1,7 +1,7 @@
 import sqlite3
 from contextlib import contextmanager
 
-DB_PATH = "Database.db"
+DB_PATH = r"C:\Users\ASUS\OneDrive\Desktop\code\serious_projects\Multi-Agent_Customer_Support_Automation\Database.db"
 
 
 @contextmanager
@@ -32,5 +32,18 @@ def _createordertable():
                     '''
                     )
         
+def _createpaymenttable():
+    with get_db_connection() as conn:
+        conn.execute('''
+                    CREATE TABLE IF NOT EXISTS payments (
+                            payment_id TEXT PRIMARY KEY,
+                            order_id TEXT,
+                            status TEXT,
+                            amount FLOAT,
+                            refund_status TEXT,
+                            created_at TIMESTAMP
+                            )
+                     ''')
+
 if __name__ == '__main__':
-    _createordertable()
+    _createpaymenttable()

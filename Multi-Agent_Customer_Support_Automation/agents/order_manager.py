@@ -1,23 +1,10 @@
-import sqlite3
-from contextlib import contextmanager
+from base_aget import Dbconnect
 from typing import Dict, Any
 
-class Order_manger():
+class Order_manger(Dbconnect):
     def __init__(self):
-        self.DB_PATH = 'C:\Users\ASUS\OneDrive\Desktop\code\serious_projects\Multi-Agent_Customer_Support_Automation\Database.db' 
+        super().__init__()
 
-    @contextmanager
-    def get_db_connection(self):
-        conn = sqlite3.connect(self.DB_PATH)
-        try:
-            conn.row_factory = sqlite3.Row   # safer dict-like access
-            yield conn
-            conn.commit()                    # commit only if no exception
-        except Exception as e:
-            conn.rollback()                  # rollback on error
-            raise e
-        finally:
-            conn.close()
 
     def _fetch_order(self, order_id: str, user_id: str):
         with self.get_db_connection() as conn:
