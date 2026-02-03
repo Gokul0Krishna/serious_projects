@@ -1,0 +1,94 @@
+PROJECT 5: Automated Compliance & Contract Analysis (TCS/Infosys/Cognizant Focus)
+--------------------------------------------------------------------------------
+RELEVANCE: Legal tech, Enterprise risk management, Regulatory compliance
+SKILLS: Document AI, NER, Clause Extraction, RAG, Legal reasoning
+
+BUILD:
+An AI system that automates contract review and compliance checking for
+enterprises handling thousands of legal documents:
+
+Core Features:
+1. Contract Intelligence
+   - Extract key clauses (termination, liability, payment terms)
+   - Identify non-standard clauses
+   - Flag risky provisions
+   - Suggest alternative language
+
+2. Compliance Checker
+   - Check contracts against regulations (GDPR, SOX, etc.)
+   - Identify non-compliant sections
+   - Generate compliance reports
+   - Track regulatory changes
+
+3. Contract Comparison
+   - Compare multiple versions of contracts
+   - Highlight changes and implications
+   - Suggest negotiation points
+
+4. Risk Scoring
+   - Overall contract risk score
+   - Clause-level risk assessment
+   - Historical risk patterns
+
+5. Auto-summarization
+   - Executive summaries of contracts
+   - Key obligations timeline
+   - Financial terms extraction
+
+Tech Stack:
+- LLM: GPT-4 or Claude-3 Opus (long context for full contracts)
+- Legal NER: Fine-tuned BERT on legal entities
+- Clause Classification: SetFit on contract clauses
+- RAG: LlamaIndex with legal knowledge base
+- Document Processing: PyMuPDF, Docling
+- Backend: FastAPI
+- Frontend: React with PDF annotation
+- Storage: PostgreSQL + S3
+
+Legal Knowledge Base:
+- Regulatory databases (SEC, EU regulations)
+- Case law (publicly available)
+- Standard contract templates
+- Company-specific policies
+
+Advanced Features:
+- Obligation extraction and tracking
+- Date and deadline management
+- Party identification and validation
+- Financial terms extraction (amounts, payment schedules)
+- Renewal and termination date tracking
+- Audit trail of all reviews
+- Bulk contract processing
+- Multi-jurisdiction support
+
+Analysis Types:
+1. Pre-signature review (before signing)
+2. Post-signature compliance monitoring
+3. Renewal analysis (should we renew?)
+4. Obligation tracking (what must we do?)
+5. Vendor risk assessment
+
+DEPLOYMENT:
+- On-premises option for sensitive data
+- Cloud deployment with encryption
+- SOC 2 Type II compliance
+- Role-based access control
+
+WHY THIS MATTERS:
+- TCS handles legal contracts for 100+ Fortune 500 clients
+- Infosys has dedicated legal tech practice
+- Cognizant's legal BPO needs automation
+- All consulting firms have legal practice areas
+
+DEMO SCENARIO:
+1. Upload NDA template
+2. Extract key terms automatically
+3. Check against company policy
+4. Flag 3 risky clauses
+5. Suggest modifications
+6. Generate approval memo
+
+COMPARISON:
+- Manual review: 2 hours per contract
+- AI-assisted review: 15 minutes per contract
+- Cost savings: 87.5%
