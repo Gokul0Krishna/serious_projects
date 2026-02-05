@@ -70,10 +70,10 @@ class Data_prep():
     
     def _final_object_creation(self,):
         return{
-            'contractid':self.contractid,
+            'contract_id':self.contractid,
             'section':[
                 {
-                    'sectionid':i['section_id'],
+                    'section_id':i['section_id'],
                     'title':i['title'],
                     'page_start':i['page_start'],
                     'page_end':i['page_end'],
@@ -131,16 +131,16 @@ class Data_prep():
     def save(self):
         contractobj = self._final_object_creation()
         contractname = Path(self.pdf_location).name
-        self.mongo_obj.save_contract(contract_obj=contractobj,filename=contractname)
+        print(self.mongo_obj.save_contract(contract_obj=contractobj,filename=contractname))
 
-    
+    def run(self):
+        self.extractblocks()
+        self.buildsections()
+        self.normalize_text()
+        self.save()
         
     
 
 if __name__ == '__main__':
     obj = Data_prep()
-    obj.extractblocks()
-    obj.buildsections()
-    obj.normalize_text()
-    obj._final_object_creation()
-    obj.save()
+    obj.run()
