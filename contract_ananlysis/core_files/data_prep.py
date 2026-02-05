@@ -1,6 +1,7 @@
 import fitz
 from collections import defaultdict
 import re
+import uuid
 
 class Data_prep():
     def __init__(self):
@@ -16,6 +17,7 @@ class Data_prep():
                             "CONFIDENTIALITY": "confidentiality",
                             "LIMITATION OF LIABILITY": "liability"
                         }
+        self.contractid = None 
 
 
     def _control(self, text):
@@ -59,13 +61,28 @@ class Data_prep():
         title = title.upper()
         for i in self.SECTION_MAP:
             if i in title:
-                return self.SECTION_MAP(i)
+                return self.SECTION_MAP[i]
         return 'other'
+    
+    def _final_object_creation(self,):
+        return{
+            'contractid':self.contractid,
+            'section':[
+                {
+                    'sectionid':i['section_id'],
+                    'title':i['title'],
+                    'page_start':i['page_start'],
+                    'page_end':i['page_end'],
+                    'text':i['text'].strip()
+                }for i in self.sections
+            ]
+        }
 
 
     def extractblocks(self):
         'extracts text into blocks'
         doc = fitz.open(self.pdf_location)
+        self.contractid = str(uuid.uuid4())
         for pagenum,page in enumerate(doc,start=1):
             page_dict = page.get_text('dict')
             for block in page_dict['blocks']:
@@ -106,6 +123,8 @@ class Data_prep():
     def normalize_text(self):
         for i in self.sections:
             i['section_id'] = self._normalize_title(i['title'])
+
+    
         
     
 
@@ -114,4 +133,4 @@ if __name__ == '__main__':
     obj.extractblocks()
     obj.buildsections()
     obj.normalize_text()
-    
+    obj._final_object_creation()
