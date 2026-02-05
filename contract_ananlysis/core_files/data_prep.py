@@ -2,9 +2,12 @@ import fitz
 from collections import defaultdict
 import re
 import uuid
+from mongo_control import Mongo_control
+from pathlib import Path
 
 class Data_prep():
     def __init__(self):
+
         self.blocks =[]
         self.pdf_location = r'C:\Users\ASUS\OneDrive\Desktop\code\serious_projects\contract_ananlysis\support_docs\petn4-781-exhibits.pdf'
         self.SELECTION_RE = re.compile(
@@ -17,7 +20,8 @@ class Data_prep():
                             "CONFIDENTIALITY": "confidentiality",
                             "LIMITATION OF LIABILITY": "liability"
                         }
-        self.contractid = None 
+        self.contractid = None
+        self.mongo_obj = Mongo_control() 
 
 
     def _control(self, text):
@@ -124,6 +128,10 @@ class Data_prep():
         for i in self.sections:
             i['section_id'] = self._normalize_title(i['title'])
 
+    def save(self):
+        contractobj = self._final_object_creation()
+        contractname = Path(self.pdf_location).name
+        self.mongo_obj.save_contract(contract_obj=contractobj,filename=contractname)
 
     
         
@@ -135,3 +143,4 @@ if __name__ == '__main__':
     obj.buildsections()
     obj.normalize_text()
     obj._final_object_creation()
+    obj.save()
