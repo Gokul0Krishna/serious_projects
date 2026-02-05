@@ -7,3 +7,4 @@ Trading/data/BTC-USD.parquet
 Predictive_Logistics_Control/backend/models/m5_clean_daily.parquet
 Predictive_Logistics_Control/backend/models/m5_clean_daily2.parquet
 Predictive_Logistics_Control/backend/models/exp_model.joblib
+contract_ananlysis/support_docs/prompt.txt

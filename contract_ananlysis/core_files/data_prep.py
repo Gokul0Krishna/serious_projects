@@ -11,13 +11,42 @@ class Data_prep():
                                         )
         self.sections = []
 
-    def _control(self,text):
+    def _control(self, text):
         text = text.strip()
-        if len(text) > 120:
+
+        # too long → paragraph
+        if len(text) > 150:
             return False
+
+        # sentence punctuation → paragraph
         if text.endswith("."):
             return False
-        return bool(self.SELECTION_RE.match(text))
+
+        # ARTICLE headings
+        if re.match(r"^ARTICLE\s+[IVXLC]+", text, re.I):
+            return True
+
+        # Numbered headings
+        if re.match(r"^[0-9]+(\.[0-9]+)*\s+[A-Za-z ]+$", text):
+            return True
+
+        # ALL CAPS short lines
+        if text.isupper() and len(text.split()) <= 10:
+            return True
+
+        # Clause keyword fallback
+        KEYWORDS = [
+            "termination",
+            "liability",
+            "payment",
+            "confidentiality",
+            "indemnification",
+            "governing law"
+        ]
+        if any(k in text.lower() for k in KEYWORDS):
+            return True
+
+        return False
 
 
     def extractblocks(self):
@@ -43,11 +72,8 @@ class Data_prep():
         current_section = None
         for block in self.blocks:
             text = block['text']
-            print(text)
             if self._control(text):
-                print('i')
                 if current_section:
-                    print('j')
                     self.sections.append(current_section)
                 current_section = {
                     'title':text,
