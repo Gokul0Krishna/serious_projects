@@ -31,7 +31,7 @@ class Mongo_control():
 
     def _check_working(self):
         return list(
-            self.collection.find({}, {"_id": 0})
+            self.collection.find({})
         )
     
     def _clean(self):
@@ -53,4 +53,6 @@ class Mongo_control():
 
 if __name__ == '__main__':
     obj = Mongo_control()
-    obj._clean()
+    z = obj._check_working()
+    print(z)
+    # obj._clean()

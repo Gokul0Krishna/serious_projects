@@ -13,6 +13,9 @@ class Data_prep():
         self.SELECTION_RE = re.compile(
                                             r"^(ARTICLE\s+[IVXLC]+|[0-9]+(\.[0-9]+)*\.?\s+[A-Z][A-Z\s]{3,})$"
                                         )
+        self.ROMAN_RE = re.compile(r"^[IVXLC]+\s+[A-Z][a-zA-Z\s]{3,}$")
+        self.NUMBERED_RE = re.compile(r"^[0-9]+\.\s+[A-Z][a-zA-Z\s]{3,}$")
+        self.VERBS = {"HAS", "HAVE", "IS", "ARE", "WAS", "WERE", "HELD"}
         self.sections = []
         self.SECTION_MAP = {
                             "TERMINATION": "termination",
@@ -22,44 +25,30 @@ class Data_prep():
                         }
         self.contractid = None
         self.mongo_obj = Mongo_control() 
+        
 
 
     def _control(self, text):
         text = text.strip()
 
-        # too long → paragraph
-        if len(text) > 150:
+        if len(text) > 80:
             return False
 
-        # sentence punctuation → paragraph
+        if text.count(" ") > 8:   # <-- KEY LINE
+            return False
+
         if text.endswith("."):
             return False
+        
+        if any(v in text.upper().split() for v in self.VERBS):
+            return False
 
-        # ARTICLE headings
-        if re.match(r"^ARTICLE\s+[IVXLC]+", text, re.I):
-            return True
-
-        # Numbered headings
-        if re.match(r"^[0-9]+(\.[0-9]+)*\s+[A-Za-z ]+$", text):
-            return True
-
-        # ALL CAPS short lines
-        if text.isupper() and len(text.split()) <= 10:
-            return True
-
-        # Clause keyword fallback
-        KEYWORDS = [
-            "termination",
-            "liability",
-            "payment",
-            "confidentiality",
-            "indemnification",
-            "governing law"
-        ]
-        if any(k in text.lower() for k in KEYWORDS):
-            return True
-
-        return False
+        return (
+            self.SELECTION_RE.match(text)
+            or self.ROMAN_RE.match(text)
+            or self.NUMBERED_RE.match(text)
+            or (text.isupper() and len(text) < 60)
+        )
     
     def _normalize_title(self,title:str):
         title = title.upper()
@@ -138,7 +127,6 @@ class Data_prep():
         self.buildsections()
         self.normalize_text()
         self.save()
-        
     
 
 if __name__ == '__main__':
