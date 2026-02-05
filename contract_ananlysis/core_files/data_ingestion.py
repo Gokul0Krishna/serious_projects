@@ -5,7 +5,7 @@ import uuid
 from mongo_control import Mongo_control
 from pathlib import Path
 
-class Data_prep():
+class Data_ingestion():
     def __init__(self):
 
         self.blocks =[]
@@ -130,5 +130,5 @@ class Data_prep():
     
 
 if __name__ == '__main__':
-    obj = Data_prep()
+    obj = Data_ingestion()
     obj.run()
