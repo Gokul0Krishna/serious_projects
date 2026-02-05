@@ -10,6 +10,13 @@ class Data_prep():
                                             r"^(ARTICLE\s+[IVXLC]+|[0-9]+(\.[0-9]+)*\.?\s+[A-Z][A-Z\s]{3,})$"
                                         )
         self.sections = []
+        self.SECTION_MAP = {
+                            "TERMINATION": "termination",
+                            "PAYMENT": "payment_terms",
+                            "CONFIDENTIALITY": "confidentiality",
+                            "LIMITATION OF LIABILITY": "liability"
+                        }
+
 
     def _control(self, text):
         text = text.strip()
@@ -47,6 +54,13 @@ class Data_prep():
             return True
 
         return False
+    
+    def _normalize_title(self,title:str):
+        title = title.upper()
+        for i in self.SECTION_MAP:
+            if i in title:
+                return self.SECTION_MAP(i)
+        return 'other'
 
 
     def extractblocks(self):
@@ -88,10 +102,16 @@ class Data_prep():
         
         if current_section:
             self.sections.append(current_section)
+
+    def normalize_text(self):
+        for i in self.sections:
+            i['section_id'] = self._normalize_title(i['title'])
+        
     
 
 if __name__ == '__main__':
     obj = Data_prep()
     obj.extractblocks()
     obj.buildsections()
-    print(obj.sections)
+    obj.normalize_text()
+    
