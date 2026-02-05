@@ -29,6 +29,15 @@ class Mongo_control():
             unique=True
         )
 
+    def _check_working(self):
+        return list(
+            self.collection.find({}, {"_id": 0})
+        )
+    
+    def _clean(self):
+        self.client.drop_database('contract_analysis')
+
+
     def save_contract(self, contract_obj, filename, source="UNKNOWN"):
         document = {
             "contract_id": contract_obj["contract_id"],
@@ -44,3 +53,4 @@ class Mongo_control():
 
 if __name__ == '__main__':
     obj = Mongo_control()
+    obj._clean()
