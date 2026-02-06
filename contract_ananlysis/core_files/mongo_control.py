@@ -29,7 +29,7 @@ class Mongo_control():
             unique=True
         )
 
-    def _check_working(self):
+    def _show_all(self):
         return list(
             self.collection.find({})
         )
