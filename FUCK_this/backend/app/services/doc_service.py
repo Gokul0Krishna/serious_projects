@@ -29,4 +29,18 @@ class Doc_service():
         return docstring
     
     def generate_readme(self, project_structure: Dict):
-        pass
+        
+        prompt = f"""Generate a professional README.md for this project:
+                Project structure:
+                {project_structure}
+                Include:
+                1. Title and description
+                2. Features
+                3. Installation
+                4. Usage (with code examples)
+                5. API documentation (if applicable)
+                6. License
+                Format in Markdown."""
+        readme = self.llm._generate(prompt)
+        return readme
+    
