@@ -4,7 +4,7 @@ from typing import List, Dict
 from chromadb.utils import embedding_functions
 import ast
 
-class RAGService:
+class Rag_service:
     def __init__(self):
         self.db_client = chromadb.PersistentClient(path="./chroma_db")
         self.embedding = embedding_functions.DefaultEmbeddingFunction()
