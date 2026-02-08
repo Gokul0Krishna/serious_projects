@@ -3,6 +3,46 @@ import axios from 'axios';
 
 const API_BASE = 'http://localhost:8000';
 
+function displayReviewResults(data: any, editor: vscode.TextEditor) {
+    const diagnostics: vscode.Diagnostic[] = [];
+
+    for (const issue of data.issues) {
+        const line = issue.line - 1;
+        const range = editor.document.lineAt(line).range;
+
+        const severity = issue.severity === 'high' 
+            ? vscode.DiagnosticSeverity.Error
+            : issue.severity === 'medium'
+            ? vscode.DiagnosticSeverity.Warning
+            : vscode.DiagnosticSeverity.Information;
+
+        const diagnostic = new vscode.Diagnostic(
+            range,
+            `${issue.description}\nSuggestion: ${issue.suggestion}`,
+            severity
+        );
+        diagnostic.source = 'AI Code Review';
+        diagnostics.push(diagnostic);
+    }
+    const collection = vscode.languages.createDiagnosticCollection('aiReview');
+    collection.set(editor.document.uri, diagnostics);
+}
+
+function formatAnswer(data: any): string {
+    let content = `# Answer\n\n${data.answer}\n\n`;
+    
+    if (data.references && data.references.length > 0) {
+        content += `## References\n\n`;
+        for (const ref of data.references) {
+            content += `- ${ref.file}:${ref.line} (relevance: ${(ref.relevance * 100).toFixed(0)}%)\n`;
+        }
+    }
+    
+    return content;
+}
+
+export function deactivate() {}
+
 export function activate(context: vscode.ExtensionContext) {
     console.log('Code Review AI extension activated');
 
