@@ -1,0 +1,45 @@
+{
+  "name": "code-review-ai",
+  "displayName": "AI Code Review Assistant",
+  "description": "Free AI-powered code review and documentation",
+  "version": "0.1.0",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": ["Programming Languages"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeReviewAI.reviewCode",
+        "title": "AI: Review Selected Code"
+      },
+      {
+        "command": "codeReviewAI.generateDocs",
+        "title": "AI: Generate Documentation"
+      },
+      {
+        "command": "codeReviewAI.askQuestion",
+        "title": "AI: Ask About Codebase"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codeReviewAI",
+          "title": "Code Review AI",
+          "icon": "resources/icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "codeReviewAI": [
+        {
+          "id": "reviewPanel",
+          "name": "Review Results"
+        }
+      ]
+    }
+  }
+}
